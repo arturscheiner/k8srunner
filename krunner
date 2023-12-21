@@ -46,6 +46,7 @@ mkdir -p $COLLECTION/$UUID
 
 #Echoes the received arguments to a log file
 echo $# $@ > $RECEIVEDARGS
+echo "$COMMAND $RESOURCE $NAME $NAMESPACE $ARGS"  > $DECODEDARGS
 
 #Generates a file on the temp dir of the remote host enconded in b64
 echo "$YAMLB64" > $YAMLB64FILE
@@ -54,8 +55,6 @@ echo "$YAMLB64" > $YAMLB64FILE
 echo "$YAML" > $YAMLFILE
 
 #Execute the kube using its engine and arguments
-#{ time $(echo $COMMAND $ARGS) $YAMLFILE $YAMLARGS > $YAMLOUTPUT; } 2> $YAMLERRFILE
-echo "$COMMAND $RESOURCE $NAME $NAMESPACE $ARGS"  > $DECODEDARGS
 #Use the ISJSON variable to deal with the output
 if [[ $ISJSON == "true" ]]; then
     if [[ ! -z $YAML ]]; then
