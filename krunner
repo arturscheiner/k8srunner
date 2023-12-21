@@ -3,16 +3,16 @@
 #By Artur Scheiner
 
 #Check if the input arguments are base64 encoded
-B64CHECK="^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$"
+# B64CHECK="^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$"
 
-if [[ -z $1 ]]; then echo "Cannot run without arguments"; exit 1; fi
-if [[ $# < 5 ]]; then echo "One or more crunner arguments is missing!"; exit 2; fi
-if [[ ! $1 =~ $B64CHECK ]]; then echo "The command or engine must be base64 encoded!"; exit 3; fi
-if [[ ! $2 =~ $B64CHECK ]]; then echo "The command options must be base64 encoded!"; exit 4; fi
-if [[ ! $3 =~ $B64CHECK ]]; then echo "The extension must be base64 encoded!"; exit 5; fi
-if [[ ! $4 =~ $B64CHECK ]]; then echo "The code must be base64 encoded!"; exit 6; fi
-if [[ ! $5 =~ $B64CHECK ]]; then echo "The isjson must be base64 encoded!"; exit 7; fi
-if [[ ! $6 =~ $B64CHECK ]]; then echo "The code arguments must be base64 encoded!"; exit 7; fi
+# if [[ -z $1 ]]; then echo "Cannot run without arguments"; exit 1; fi
+# if [[ $# < 5 ]]; then echo "One or more crunner arguments is missing!"; exit 2; fi
+# if [[ ! $1 =~ $B64CHECK ]]; then echo "The command or engine must be base64 encoded!"; exit 3; fi
+# if [[ ! $2 =~ $B64CHECK ]]; then echo "The command options must be base64 encoded!"; exit 4; fi
+# if [[ ! $3 =~ $B64CHECK ]]; then echo "The extension must be base64 encoded!"; exit 5; fi
+# if [[ ! $4 =~ $B64CHECK ]]; then echo "The code must be base64 encoded!"; exit 6; fi
+# if [[ ! $5 =~ $B64CHECK ]]; then echo "The isjson must be base64 encoded!"; exit 7; fi
+# if [[ ! $6 =~ $B64CHECK ]]; then echo "The code arguments must be base64 encoded!"; exit 7; fi
 
 #Define the variable that represents the engine binary name
 COMMAND=$(echo $1 | base64 -d)
@@ -58,7 +58,15 @@ echo "$YAML" > $YAMLFILE
 echo "$COMMAND $RESOURCE $NAME $NAMESPACE $ARGS"  > $DECODEDARGS
 #Use the ISJSON variable to deal with the output
 if [[ $ISJSON == "true" ]]; then
-    kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS -o json
+    if [[ ! -z $YAML ]]; then
+        kubectl $COMMAND -f $YAMLFILE -o json
+    else
+        kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS -o json
+    fi
 else
-    kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS
+    if [[ ! -z $YAML ]]; then
+        kubectl $COMMAND -f $YAMLFILE
+    else
+        kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS
+    fi
 fi
