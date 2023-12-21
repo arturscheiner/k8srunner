@@ -39,6 +39,7 @@ YAMLRESJSON="$COLLECTION/$UUID/kube.$EXT.result.json"
 YAMLTIMJSON="$COLLECTION/$UUID/kube.$EXT.time.json"
 YAMLOUTPUT="$COLLECTION/$UUID/kube.$EXT.output.txt"
 RECEIVEDARGS="$COLLECTION/$UUID/crunner.received.args.log"
+DECODEDARGS="$COLLECTION/$UUID/crunner.decoded.args.log"
 
 #Create kube collection folder
 mkdir -p $COLLECTION/$UUID
@@ -54,7 +55,7 @@ echo "$YAML" > $YAMLFILE
 
 #Execute the kube using its engine and arguments
 #{ time $(echo $COMMAND $ARGS) $YAMLFILE $YAMLARGS > $YAMLOUTPUT; } 2> $YAMLERRFILE
-
+echo "$COMMAND $RESOURCE $NAME $NAMESPACE $ARGS"  > $DECODEDARGS
 #Use the ISJSON variable to deal with the output
 if [[ $ISJSON == "true" ]]; then
     kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS -o json
