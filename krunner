@@ -1,0 +1,63 @@
+#!/bin/bash
+#Kubectl Runner Script
+#By Artur Scheiner
+
+#Check if the input arguments are base64 encoded
+B64CHECK="^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$"
+
+if [[ -z $1 ]]; then echo "Cannot run without arguments"; exit 1; fi
+if [[ $# < 5 ]]; then echo "One or more crunner arguments is missing!"; exit 2; fi
+if [[ ! $1 =~ $B64CHECK ]]; then echo "The command or engine must be base64 encoded!"; exit 3; fi
+if [[ ! $2 =~ $B64CHECK ]]; then echo "The command options must be base64 encoded!"; exit 4; fi
+if [[ ! $3 =~ $B64CHECK ]]; then echo "The extension must be base64 encoded!"; exit 5; fi
+if [[ ! $4 =~ $B64CHECK ]]; then echo "The code must be base64 encoded!"; exit 6; fi
+if [[ ! $5 =~ $B64CHECK ]]; then echo "The isjson must be base64 encoded!"; exit 7; fi
+if [[ ! $6 =~ $B64CHECK ]]; then echo "The code arguments must be base64 encoded!"; exit 7; fi
+
+#Define the variable that represents the engine binary name
+COMMAND=$(echo $1 | base64 -d)
+RESOURCE=$(echo $2 | base64 -d)
+NAME=$(echo $3 | base64 -d)
+ARGS=$(echo $4 | base64 -d)
+NAMESPACE=$(echo $5 | base64 -d)
+YAMLB64=$6
+ISJSON="$(echo $7 | base64 -d)"
+
+EXT="yaml"
+YAML="$(echo $YAMLB64 | base64 -d)"
+
+
+#Generate a UUID
+UUID=$(uuidgen -r)
+
+#Collection PATH
+COLLECTION="$HOME/.kuberuns/$COMMAND"
+YAMLFILE="$COLLECTION/$UUID/kube.$EXT"
+YAMLB64FILE="$COLLECTION/$UUID/kube.b64.$EXT"
+YAMLERRFILE="$COLLECTION/$UUID/kube.$EXT.err"
+YAMLRESJSON="$COLLECTION/$UUID/kube.$EXT.result.json"
+YAMLTIMJSON="$COLLECTION/$UUID/kube.$EXT.time.json"
+YAMLOUTPUT="$COLLECTION/$UUID/kube.$EXT.output.txt"
+RECEIVEDARGS="$COLLECTION/$UUID/crunner.received.args.log"
+
+#Create kube collection folder
+mkdir -p $COLLECTION/$UUID
+
+#Echoes the received arguments to a log file
+echo $# $@ > $RECEIVEDARGS
+
+#Generates a file on the temp dir of the remote host enconded in b64
+echo "$YAMLB64" > $YAMLB64FILE
+
+#Convert the encoded b64 a kube file on the username home directory
+echo "$YAML" > $YAMLFILE
+
+#Execute the kube using its engine and arguments
+#{ time $(echo $COMMAND $ARGS) $YAMLFILE $YAMLARGS > $YAMLOUTPUT; } 2> $YAMLERRFILE
+
+#Use the ISJSON variable to deal with the output
+if [[ $ISJSON == "true" ]]; then
+    kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS -o json
+else
+    kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS
+fi
