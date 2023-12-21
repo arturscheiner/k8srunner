@@ -59,13 +59,13 @@ echo "$COMMAND $RESOURCE $NAME $NAMESPACE $ARGS"  > $DECODEDARGS
 #Use the ISJSON variable to deal with the output
 if [[ $ISJSON == "true" ]]; then
     if [[ ! -z $YAML ]]; then
-        kubectl $COMMAND -f $YAMLFILE -o json
+        kubectl $COMMAND -f $YAMLFILE $NAMESPACE -o json
     else
         kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS -o json
     fi
 else
     if [[ ! -z $YAML ]]; then
-        kubectl $COMMAND -f $YAMLFILE
+        kubectl $COMMAND -f $YAMLFILE $NAMESPACE
     else
         kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS
     fi
