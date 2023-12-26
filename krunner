@@ -22,6 +22,9 @@ ARGS=$(echo $4 | base64 -d)
 NAMESPACE=$(echo $5 | base64 -d)
 YAMLB64=$6
 ISJSON="$(echo $7 | base64 -d)"
+CALLBACK="$(echo $8 | base64 -d)"
+URL="$(echo $9 | base64 -d)"
+APIKEY="$(echo $10 | base64 -d)"
 
 EXT="yaml"
 YAML="$(echo $YAMLB64 | base64 -d)"
@@ -69,3 +72,50 @@ else
         kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS
     fi
 fi
+
+#Execute the CALLBACK function in background
+#Use the CALLBACK variable to deal with the output
+if [[ $CALLBACK == "true" ]]; then
+    callback
+fi
+
+callback() {
+    PAYLOAD=$(payload $NAME $NAMESPACE $(rolloutStatus))
+
+    curl $URL \
+    -H 'authority: core.godigibee.io' \
+    -H 'accept: */*' \
+    -H 'accept-language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7' \
+    -H "apikey: $APIKEY" \
+    -H 'content-type: application/json' \
+    -H 'origin: https://www.godigibee.io' \
+    -H 'referer: https://www.godigibee.io/' \
+    -H 'sec-ch-ua: "Chromium";v="110", "Not A(Brand";v="24", "Google Chrome";v="110"' \
+    -H 'sec-ch-ua-mobile: ?0' \
+    -H 'sec-ch-ua-platform: "macOS"' \
+    -H 'sec-fetch-dest: empty' \
+    -H 'sec-fetch-mode: cors' \
+    -H 'sec-fetch-site: same-site' \
+    -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36' \
+    --data-raw "$PAYLOAD" \
+    --compressed
+}
+
+payload(){
+    DEPLOY=$1
+    NAMESPACE=$2
+    STATUS=$3
+    PAYLOAD="{\"deployment\": \"$DEPLOY\", \"namespace\": \"$NAMESPACE\", \"status\": \"$STATUS\"}"
+
+    echo $PAYLOAD
+}
+
+rolloutStatus(){
+    STATUS=$(kubectl rollout status deploy $NAME  | grep "rolled out")
+
+    if [[ -z $STATUS ]]; then
+        echo "error"
+    else
+        echo "success"
+    fi
+}
