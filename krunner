@@ -69,7 +69,7 @@ payload(){
 rolloutStatus(){
     STATUS=$(kubectl rollout status deploy $NAME  | grep "rolled out")
 
-    if [[ -z $STATUS ]]; then
+    if [[ $STATUS == "" ]]; then
         echo "error"
     else
         echo "success"
