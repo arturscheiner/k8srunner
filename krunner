@@ -57,27 +57,24 @@ echo "$YAMLB64" > $YAMLB64FILE
 #Convert the encoded b64 a kube file on the username home directory
 echo "$YAML" > $YAMLFILE
 
-#Execute the kube using its engine and arguments
-#Use the ISJSON variable to deal with the output
-if [[ $ISJSON == "true" ]]; then
-    if [[ ! -z $YAML ]]; then
-        kubectl $COMMAND -f $YAMLFILE $NAMESPACE -o json
-    else
-        kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS -o json
-    fi
-else
-    if [[ ! -z $YAML ]]; then
-        kubectl $COMMAND -f $YAMLFILE $NAMESPACE
-    else
-        kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS
-    fi
-fi
+payload(){
+    DEPLOY=$1
+    NAMESPACE=$2
+    STATUS=$3
+    PAYLOAD="{\"deployment\": \"$DEPLOY\", \"namespace\": \"$NAMESPACE\", \"status\": \"$STATUS\"}"
 
-#Execute the CALLBACK function in background
-#Use the CALLBACK variable to deal with the output
-if [[ $CALLBACK == "true" ]]; then
-    callback
-fi
+    echo $PAYLOAD
+}
+
+rolloutStatus(){
+    STATUS=$(kubectl rollout status deploy $NAME  | grep "rolled out")
+
+    if [[ -z $STATUS ]]; then
+        echo "error"
+    else
+        echo "success"
+    fi
+}
 
 callback() {
     PAYLOAD=$(payload $NAME $NAMESPACE $(rolloutStatus))
@@ -101,21 +98,24 @@ callback() {
     --compressed
 }
 
-payload(){
-    DEPLOY=$1
-    NAMESPACE=$2
-    STATUS=$3
-    PAYLOAD="{\"deployment\": \"$DEPLOY\", \"namespace\": \"$NAMESPACE\", \"status\": \"$STATUS\"}"
-
-    echo $PAYLOAD
-}
-
-rolloutStatus(){
-    STATUS=$(kubectl rollout status deploy $NAME  | grep "rolled out")
-
-    if [[ -z $STATUS ]]; then
-        echo "error"
+#Execute the kube using its engine and arguments
+#Use the ISJSON variable to deal with the output
+if [[ $ISJSON == "true" ]]; then
+    if [[ ! -z $YAML ]]; then
+        kubectl $COMMAND -f $YAMLFILE $NAMESPACE -o json
     else
-        echo "success"
+        kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS -o json
     fi
-}
+else
+    if [[ ! -z $YAML ]]; then
+        kubectl $COMMAND -f $YAMLFILE $NAMESPACE
+    else
+        kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS
+    fi
+fi
+
+#Execute the CALLBACK function in background
+#Use the CALLBACK variable to deal with the output
+if [[ $CALLBACK == "true" ]]; then
+    callback
+fi
