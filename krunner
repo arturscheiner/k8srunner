@@ -111,7 +111,7 @@ createNamespace(){
 }
 
 #Create Namespace if it doesn't exists
-createNamespace
+createNamespace > /dev/null
 
 #Execute the kube using its engine and arguments
 #Use the ISJSON variable to deal with the output
