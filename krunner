@@ -82,6 +82,8 @@ callback() {
     APIKEY=$2
     PAYLOAD=$(payload $NAME $NAMESPACE $(rolloutStatus))
 
+    echo $URL $APIKEY
+
     curl $URL -X POST -s \
     -H 'authority: core.godigibee.io' \
     -H 'accept: */*' \
