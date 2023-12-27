@@ -24,7 +24,7 @@ YAMLB64=$6
 ISJSON="$(echo $7 | base64 -d)"
 CALLBACK="$(echo $8 | base64 -d)"
 URL="$(echo $9 | base64 -d)"
-APIKEY="$(echo $10 | base64 -d)"
+APIKEY="$(echo ${10} | base64 -d)"
 
 EXT="yaml"
 YAML="$(echo $YAMLB64 | base64 -d)"
