@@ -78,6 +78,8 @@ rolloutStatus(){
 }
 
 callback() {
+    URL=$1
+    APIKEY=$2
     PAYLOAD=$(payload $NAME $NAMESPACE $(rolloutStatus))
 
     curl $URL -X POST -s \
@@ -118,5 +120,5 @@ fi
 #Execute the CALLBACK function in background
 #Use the CALLBACK variable to deal with the output
 if [[ $CALLBACK == "true" ]]; then
-    callback > $CALLBACKLOG &
+    callback $URL $APIKEY > $CALLBACKLOG &
 fi
