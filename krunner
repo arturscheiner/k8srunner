@@ -106,15 +106,15 @@ callback() {
 #Use the ISJSON variable to deal with the output
 if [[ $ISJSON == "true" ]]; then
     if [[ ! -z $YAML ]]; then
-        kubectl $COMMAND -f $YAMLFILE $NAMESPACE -o json
+        kubectl $COMMAND -f $YAMLFILE -n $NAMESPACE -o json
     else
-        kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS -o json
+        kubectl $COMMAND $RESOURCE $NAME -n $NAMESPACE $ARGS -o json
     fi
 else
     if [[ ! -z $YAML ]]; then
-        kubectl $COMMAND -f $YAMLFILE $NAMESPACE
+        kubectl $COMMAND -f $YAMLFILE -n $NAMESPACE
     else
-        kubectl $COMMAND $RESOURCE $NAME $NAMESPACE $ARGS
+        kubectl $COMMAND $RESOURCE $NAME -n $NAMESPACE $ARGS
     fi
 fi
 
