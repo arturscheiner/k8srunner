@@ -43,6 +43,7 @@ YAMLTIMJSON="$COLLECTION/$UUID/kube.$EXT.time.json"
 YAMLOUTPUT="$COLLECTION/$UUID/kube.$EXT.output.txt"
 RECEIVEDARGS="$COLLECTION/$UUID/crunner.received.args.log"
 DECODEDARGS="$COLLECTION/$UUID/crunner.decoded.args.log"
+CALLBACKLOG="$COLLECTION/$UUID/callback.log"
 
 #Create kube collection folder
 mkdir -p $COLLECTION/$UUID
@@ -117,5 +118,5 @@ fi
 #Execute the CALLBACK function in background
 #Use the CALLBACK variable to deal with the output
 if [[ $CALLBACK == "true" ]]; then
-    callback &
+    callback > $CALLBACKLOG &
 fi
