@@ -78,8 +78,6 @@ rolloutStatus(){
 }
 
 callback() {
-    URL=$1
-    APIKEY=$2
     PAYLOAD=$(payload $NAME $NAMESPACE $(rolloutStatus))
 
     echo $URL $APIKEY
