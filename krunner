@@ -117,5 +117,5 @@ fi
 #Execute the CALLBACK function in background
 #Use the CALLBACK variable to deal with the output
 if [[ $CALLBACK == "true" ]]; then
-    callback
+    callback &
 fi
