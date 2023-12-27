@@ -61,7 +61,7 @@ payload(){
     DEPLOY=$1
     NAMESPACE=$2
     STATUS=$3
-    PAYLOAD="{\"deployment\": \"$DEPLOY\", \"namespace\": \"$NAMESPACE\", \"status\": \"$STATUS\"}"
+    PAYLOAD="{\"deploy-name\": \"$DEPLOY\", \"deploy-namespace\": \"$NAMESPACE\", \"deploy-status\": \"$STATUS\"}"
 
     echo $PAYLOAD
 }
