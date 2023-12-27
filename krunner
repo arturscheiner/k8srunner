@@ -81,6 +81,7 @@ callback() {
     PAYLOAD=$(payload $NAME $NAMESPACE $(rolloutStatus))
 
     echo $URL $APIKEY
+    echo $PAYLOAD
 
     curl $URL -X POST -s \
     -H 'authority: core.godigibee.io' \
@@ -120,5 +121,5 @@ fi
 #Execute the CALLBACK function in background
 #Use the CALLBACK variable to deal with the output
 if [[ $CALLBACK == "true" ]]; then
-    callback $URL $APIKEY > $CALLBACKLOG &
+    callback > $CALLBACKLOG &
 fi
