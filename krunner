@@ -102,6 +102,17 @@ callback() {
     --compressed
 }
 
+createNamespace(){
+    NAMESPACES=($(kubectl get namespace | sed 1,1d | awk '{print $1}'))
+    if [[ ! "${NAMESPACES[@]}" =~ " $NAMESPACE " ]]
+    then  
+        kubectl create namespace $NAMESPACE
+    fi
+}
+
+#Create Namespace if it doesn't exists
+createNamespace
+
 #Execute the kube using its engine and arguments
 #Use the ISJSON variable to deal with the output
 if [[ $ISJSON == "true" ]]; then
